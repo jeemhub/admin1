@@ -1,19 +1,22 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
+import { supabase } from '../lib/supabaseClient'
 
 export default function Login() {
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    // بيانات الدخول الثابتة (يمكنك تعديلها)
-    if (username === 'admin' && password === '123456') {
-      document.cookie = 'auth=true; path=/'
-      router.push('/')
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    setLoading(false)
+    if (error) {
+      alert('البريد الإلكتروني أو كلمة المرور غير صحيحة')
     } else {
-      alert('اسم المستخدم أو كلمة المرور غير صحيحة')
+      router.push('/')
     }
   }
 
@@ -54,11 +57,12 @@ export default function Login() {
           <span style={{ color: '#fff', fontSize: 36, fontWeight: 'bold', fontFamily: 'monospace' }}>🔒</span>
         </div>
         <h2 style={{ marginBottom: 24, textAlign: 'center', color: '#374151', fontWeight: 700, fontSize: 26 }}>تسجيل الدخول</h2>
-        <label style={{ alignSelf: 'flex-end', marginBottom: 6, color: '#374151', fontWeight: 500 }}>اسم المستخدم</label>
+        <label style={{ alignSelf: 'flex-end', marginBottom: 6, color: '#374151', fontWeight: 500 }}>البريد الإلكتروني</label>
         <input
-          placeholder="اسم المستخدم"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
+          type="email"
+          placeholder="البريد الإلكتروني"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
           style={{
             display: 'block',
             marginBottom: 18,
@@ -97,6 +101,7 @@ export default function Login() {
         />
         <button
           type="submit"
+          disabled={loading}
           style={{
             width: '100%',
             padding: 14,
@@ -106,16 +111,17 @@ export default function Login() {
             borderRadius: 8,
             fontSize: 18,
             fontWeight: 'bold',
-            cursor: 'pointer',
+            cursor: loading ? 'not-allowed' : 'pointer',
             boxShadow: '0 2px 8px #6366f122',
             transition: 'background 0.2s',
             marginTop: 8,
             letterSpacing: 1,
+            opacity: loading ? 0.7 : 1,
           }}
           onMouseOver={e => e.target.style.background = 'linear-gradient(90deg, #4f46e5 0%, #2563eb 100%)'}
           onMouseOut={e => e.target.style.background = 'linear-gradient(90deg, #6366f1 0%, #60a5fa 100%)'}
         >
-          دخول
+          {loading ? 'جاري الدخول...' : 'دخول'}
         </button>
       </form>
     </div>
