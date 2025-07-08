@@ -1,0 +1,186 @@
+/* Reset and base styles */
+body {
+  font-family: 'Tajawal', 'Cairo', Arial, sans-serif;
+  background: linear-gradient(135deg, #f4f6fb 0%, #e9eefd 100%);
+  margin: 0;
+  padding: 0;
+  color: #222;
+  font-size: 1.08rem;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.5px;
+}
+
+.container, div[style*="padding: 2rem"] {
+  background: rgba(255,255,255,0.98);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+  max-width: 700px;
+  margin: 2.5rem auto;
+  padding: 2.2rem 2rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.container:hover, div[style*="padding: 2rem"]:hover {
+  box-shadow: 0 8px 32px rgba(0,112,243,0.10);
+  transform: translateY(-2px) scale(1.01);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: linear-gradient(90deg, #f9fafc 60%, #e9eefd 100%);
+  border-radius: 14px;
+  margin-bottom: 1.2rem;
+  padding: 1.1rem 1rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+li:hover {
+  box-shadow: 0 4px 16px rgba(0,112,243,0.10);
+  transform: translateY(-1px) scale(1.01);
+}
+
+input, button, select {
+  font-family: inherit;
+  font-size: 1.08rem;
+  margin: 0.4rem 0.7rem 0.4rem 0;
+  padding: 0.7rem 1.1rem;
+  border-radius: 10px;
+  border: 1.5px solid #d1d5db;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+  background: #f9fafc;
+}
+
+input:focus, select:focus {
+  border: 2px solid #0070f3;
+  box-shadow: 0 0 0 2px #cce3ff;
+  background: #fff;
+}
+
+button {
+  background: linear-gradient(90deg, #0070f3 0%, #005bb5 100%);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(0,112,243,0.10);
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  letter-spacing: 0.5px;
+}
+button:hover {
+  background: linear-gradient(90deg, #005bb5 0%, #0070f3 100%);
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 4px 20px rgba(0,112,243,0.13);
+}
+button:focus {
+  outline: 2px solid #0070f3;
+  outline-offset: 2px;
+}
+
+img {
+  border-radius: 10px;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  max-width: 120px;
+  background: #f4f6fb;
+}
+
+.navbar {
+  background: linear-gradient(90deg, #23272f 60%, #005bb5 100%);
+  color: #fff;
+  padding: 1.1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 18px rgba(0,112,243,0.10);
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+}
+.navbar-content {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.2rem;
+}
+.navbar-content > a {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 2px 8px #005bb5;
+}
+.navbar-links {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.navbar-links a {
+  color: #fff;
+  margin: 0 1.2rem;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.08rem;
+  transition: color 0.2s, text-shadow 0.2s;
+  text-shadow: 0 1px 4px rgba(0,112,243,0.13);
+  border-radius: 6px;
+  padding: 0.3rem 0.8rem;
+  text-align: center;
+  background: rgba(0,0,0,0.04);
+}
+.navbar-links a:hover, .navbar-links a:focus {
+  color: #ffcb05;
+  background: #222;
+  text-decoration: underline;
+  text-shadow: 0 2px 8px #0070f3;
+  outline: none;
+}
+
+@media (max-width: 700px) {
+  .container, div[style*="padding: 2rem"] {
+    padding: 1rem !important;
+    margin: 1rem 0.5rem;
+  }
+  .navbar-content {
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0.5rem;
+  }
+  .navbar-links {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.7rem;
+  }
+  .navbar-links a {
+    margin: 0.3rem 0;
+    font-size: 1.13rem;
+    width: 100%;
+    max-width: 250px;
+  }
+  input, button, select {
+    width: 100%;
+    margin: 0.4rem 0;
+  }
+  li {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 0.7rem;
+  }
+}
