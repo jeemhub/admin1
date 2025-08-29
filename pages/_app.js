@@ -1,45 +1,133 @@
 import '../styles/globals.css'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+import 'swiper/css/scrollbar'
+import '@fontsource/roboto/300.css'
+import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/500.css'
+import '@fontsource/roboto/700.css'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { CssBaseline } from '@mui/material'
 import Navbar from '../components/Navbar'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
 
 export default function App({ Component, pageProps }) {
-  const router = useRouter()
-  const hideNavbar = router.pathname === '/login'
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user && router.pathname !== '/login') {
-        router.replace('/login')
-      }
-      setLoading(false)
-    }
-    checkAuth()
-    // Listen to auth state changes
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session && router.pathname !== '/login') {
-        router.replace('/login')
-      }
-      if (session && router.pathname === '/login') {
-        router.replace('/')
-      }
-    })
-    return () => {
-      listener?.subscription.unsubscribe()
-    }
-  }, [router])
-
-  if (loading && router.pathname !== '/login') {
-    return <div style={{textAlign:'center',marginTop:'3rem'}}>جاري التحقق من الدخول...</div>
-  }
+  // Create custom theme
+  const theme = createTheme({
+    direction: 'rtl',
+    palette: {
+      primary: {
+        main: '#667eea',
+        light: '#8b9ff6',
+        dark: '#4a5fd8',
+      },
+      secondary: {
+        main: '#f093fb',
+        light: '#f4b5ff',
+        dark: '#c471d9',
+      },
+      background: {
+        default: '#f8f9fa',
+        paper: '#ffffff',
+      },
+    },
+    typography: {
+      fontFamily: 'Tajawal, Cairo, Roboto, Arial, sans-serif',
+      h1: {
+        fontWeight: 700,
+        fontSize: '2.5rem',
+        '@media (max-width: 600px)': {
+          fontSize: '2rem',
+        },
+      },
+      h2: {
+        fontWeight: 600,
+        fontSize: '2rem',
+        '@media (max-width: 600px)': {
+          fontSize: '1.5rem',
+        },
+      },
+      h3: {
+        fontWeight: 600,
+        fontSize: '1.5rem',
+        '@media (max-width: 600px)': {
+          fontSize: '1.25rem',
+        },
+      },
+      h4: {
+        fontWeight: 600,
+        fontSize: '1.5rem',
+        '@media (max-width: 600px)': {
+          fontSize: '1.25rem',
+        },
+      },
+      h5: {
+        fontWeight: 600,
+        fontSize: '1.25rem',
+        '@media (max-width: 600px)': {
+          fontSize: '1.1rem',
+        },
+      },
+      h6: {
+        fontWeight: 600,
+        fontSize: '1.1rem',
+        '@media (max-width: 600px)': {
+          fontSize: '1rem',
+        },
+      },
+    },
+    components: {
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: 16,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
+            },
+            '@media (max-width: 600px)': {
+              borderRadius: 12,
+              margin: '8px',
+            },
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 12,
+            textTransform: 'none',
+            fontWeight: 600,
+            padding: '10px 24px',
+            '@media (max-width: 600px)': {
+              padding: '8px 16px',
+              fontSize: '0.875rem',
+            },
+          },
+        },
+      },
+      MuiContainer: {
+        styleOverrides: {
+          root: {
+            '@media (max-width: 600px)': {
+              paddingLeft: '16px',
+              paddingRight: '16px',
+            },
+          },
+        },
+      },
+    },
+  })
 
   return (
-    <>
-      {!hideNavbar && <Navbar />}
-      <Component {...pageProps} />
-    </>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Navbar />
+      <div style={{ marginTop: '80px' }}>
+        <Component {...pageProps} />
+      </div>
+    </ThemeProvider>
   )
 }
