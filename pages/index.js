@@ -13,16 +13,24 @@ import {
   TextField,
   InputAdornment,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Divider,
+  Chip
 } from '@mui/material'
 import {
   Inventory,
   Category,
   Add,
   Search,
-  ArrowForward
+  ArrowForward,
+  Clear
 } from '@mui/icons-material'
 import { motion } from 'framer-motion'
+import { supabase } from '../lib/supabaseClient'
 
 
 
@@ -37,6 +45,8 @@ export default function Home() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [isSearching, setIsSearching] = useState(false)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -59,9 +69,72 @@ export default function Home() {
     }
   }
 
-  const handleSearch = (query) => {
+  const handleSearch = async (query) => {
     setSearchQuery(query)
-    console.log('Searching for:', query)
+    
+    if (!query.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    setIsSearching(true)
+    
+    try {
+      // البحث في المنتجات
+      const { data: products, error: productsError } = await supabase
+        .from('products')
+        .select('id, name, name_ar, price, image_url, category_id')
+        .or(`name.ilike.%${query}%, name_ar.ilike.%${query}%, description.ilike.%${query}%`)
+        .limit(5)
+
+      // البحث في التصنيفات
+      const { data: categories, error: categoriesError } = await supabase
+        .from('categories')
+        .select('id, name, name_ar, description')
+        .or(`name.ilike.%${query}%, name_ar.ilike.%${query}%, description.ilike.%${query}%`)
+        .limit(5)
+
+      if (productsError) console.error('Products search error:', productsError)
+      if (categoriesError) console.error('Categories search error:', categoriesError)
+
+      const results = []
+      
+      // إضافة المنتجات مع نوع "product"
+      if (products) {
+        products.forEach(product => {
+          results.push({
+            ...product,
+            type: 'product',
+            displayName: product.name_ar || product.name,
+            displayDescription: product.description_ar || product.description || `السعر: ${product.price} ريال`
+          })
+        })
+      }
+
+      // إضافة التصنيفات مع نوع "category"
+      if (categories) {
+        categories.forEach(category => {
+          results.push({
+            ...category,
+            type: 'category',
+            displayName: category.name_ar || category.name,
+            displayDescription: category.description || 'تصنيف'
+          })
+        })
+      }
+
+      setSearchResults(results)
+    } catch (error) {
+      console.error('Search error:', error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  const clearSearch = () => {
+    setSearchQuery('')
+    setSearchResults([])
   }
 
   return (
@@ -111,6 +184,16 @@ export default function Home() {
                         <Search sx={{ color: 'primary.main' }} />
                       </InputAdornment>
                     ),
+                    endAdornment: searchQuery && (
+                      <InputAdornment position="end">
+                        <Button
+                          onClick={clearSearch}
+                          sx={{ minWidth: 'auto', p: 1 }}
+                        >
+                          <Clear />
+                        </Button>
+                      </InputAdornment>
+                    )
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -124,6 +207,63 @@ export default function Home() {
               </Box>
             </Card>
           </motion.div>
+
+          {/* Search Results */}
+          {searchResults.length > 0 && (
+            <motion.div variants={itemVariants}>
+              <Card sx={{ mb: 4, p: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, textAlign: 'center' }}>
+                  نتائج البحث ({searchResults.length})
+                </Typography>
+                <List>
+                  {searchResults.map((result, index) => (
+                    <Box key={`${result.type}-${result.id}`}>
+                      <ListItem 
+                        button 
+                        component={Link} 
+                        href={`/${result.type === 'product' ? 'products' : 'categories'}/${result.type === 'product' ? 'edit' : 'edit'}/${result.id}`}
+                        sx={{ 
+                          borderRadius: 2,
+                          mb: 1,
+                          '&:hover': {
+                            bgcolor: 'action.hover'
+                          }
+                        }}
+                      >
+                        <ListItemAvatar>
+                          <Avatar sx={{ 
+                            bgcolor: result.type === 'product' ? 'primary.main' : 'secondary.main',
+                            width: 50,
+                            height: 50
+                          }}>
+                            {result.type === 'product' ? <Inventory /> : <Category />}
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                {result.displayName}
+                              </Typography>
+                              <Chip 
+                                label={result.type === 'product' ? 'منتج' : 'تصنيف'} 
+                                size="small" 
+                                color={result.type === 'product' ? 'primary' : 'secondary'}
+                                sx={{ fontSize: '0.75rem' }}
+                              />
+                            </Box>
+                          }
+                          secondary={result.displayDescription}
+                        />
+                        <ArrowForward sx={{ color: 'primary.main' }} />
+                      </ListItem>
+                      {index < searchResults.length - 1 && <Divider />}
+                    </Box>
+                  ))}
+                </List>
+              </Card>
+            </motion.div>
+          )}
 
 
 
